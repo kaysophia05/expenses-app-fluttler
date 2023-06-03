@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//Barras do grafico
 class ChartBar extends StatelessWidget {
   final String? label;
   final double? value;

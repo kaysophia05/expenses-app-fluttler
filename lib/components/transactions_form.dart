@@ -4,10 +4,8 @@ import 'package:intl/intl.dart';
 
 class TransactionForm extends StatefulWidget {
   const TransactionForm(this.onSubmit, {Key? key}) : super(key: key);
-  //const TransactionForm(this.titlecontroller,this.valuecontroller,super.key);
 
-  //o componente filho (form) declara uma variável função q recebe 2 valores
-  //comunicação os widgets
+  //o componente filho (form) declara uma variável função q recebe 3 valores
   final void Function(String tittle, double value, DateTime) onSubmit;
 
   @override
@@ -15,11 +13,14 @@ class TransactionForm extends StatefulWidget {
 }
 
 class _TransactionFormState extends State<TransactionForm> {
+  //armazenam os valores do user nos campos de texto
   final titlecontroller = TextEditingController();
   final valuecontroller = TextEditingController();
 
+  //armazena a data selecionada pelo user
   DateTime? _selectedDate = DateTime.now();
 
+  //Chamado quando o formulario for submetido, obtendo os valores e convertendo para double
   _submitForm() {
     final title = titlecontroller.text;
     final value = double.tryParse(valuecontroller.text) ?? 0.0;
@@ -30,6 +31,7 @@ class _TransactionFormState extends State<TransactionForm> {
     widget.onSubmit(title, value, _selectedDate!);
   }
 
+  //Responsável por mostrar o seletor de datas
   _datePicker() {
     showDatePicker(
       context: context,
@@ -104,14 +106,11 @@ class _TransactionFormState extends State<TransactionForm> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 ElevatedButton(
-                  //Assim que o notão é clicado, a função declarada obtem os 2 valores e repassa p/ o componete pai
-                  //(USER) para a função _addtransaction, para os dados serem adicionados a lista de transações
+                  //Assim que o botão é clicado, a função declarada obtem os 2 valores e repassa p/ o componete pai
+                  //OnSubmit passa para  _addtransaction no main, para os dados serem adicionados a lista de transações
                   onPressed: _submitForm,
                   child: const Text(
                     'Nova Transação',
-                    // style: TextStyle(
-                    //   color: Colors.white,
-                    // ),
                   ),
                 )
               ],

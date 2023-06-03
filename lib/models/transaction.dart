@@ -1,3 +1,4 @@
+//Definição do modelo de dados de ua transação de despesas
 class Transaction {
   final String id;
   final String title;

@@ -7,25 +7,23 @@ import 'dart:math';
 
 void main() => runApp(ExpensesApp());
 
+//Tema e o material app raiz
 class ExpensesApp extends StatelessWidget {
   ExpensesApp({Key? key}) : super(key: key);
-  //Variável que irá armazenar o tema do app
-  final ThemeData tema = ThemeData();
+
+  final ThemeData tema = ThemeData(); //Variável que irá armazenar o tema do ap
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const MyHomePage(),
-      //copyWith() modifica propiedades do tema como a colorScheme, nela as cores primária e secundária são definidas
+      //com o uso do copy, faço uma copia do tema atual do flutter e aplico alterações
       theme: tema.copyWith(
         colorScheme: tema.colorScheme.copyWith(
           primary: Colors.purple,
           secondary: Colors.amber,
         ),
-
-        //para isso as fontes foram declaradas no pubspec
-        //texttheme se trata dos temas de texto globais, como na lista
-        //com o uso do copy, faço uma copia do tema atual do flutter e aplico alterações
+        //texttheme se trata dos temas de texto globais
         textTheme: tema.textTheme.copyWith(
           //titleLarge: É um estilo de texto personalizado que está sendo definido para um título grande.
           titleLarge: const TextStyle(
@@ -35,9 +33,9 @@ class ExpensesApp extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        //appbartheme se trata do tema de texto do appbar
+        //appbartheme =>  tema de texto do appbar
         appBarTheme: const AppBarTheme(
-          //titleTextStyle: É um estilo de texto personalizado para o título na barra de aplicativos
+          //titleTextStyle: estilo de texto personalizado para o título do app bar
           titleTextStyle: TextStyle(
               fontFamily: 'OpenSans',
               fontSize: 20,
@@ -57,10 +55,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Transaction> mytransactionsList = [];
+  final List<Transaction> mytransactionsList =
+      []; //crianção de uma lista <classe transaction> p/ as transações
 
-//função verifica se a data da transação é dentro de um intervalo de sete dias a partir da data atual, e se for, retorna true
-//por fim, o resultado é convertivo em mais uma transação na lista
+//função verifica se a data da transação é dentro de um intervalo de sete dias a partir da data atual,  se for, retorna true
+//Resultado é convertivo em mais uma transação recente na lista
   List<Transaction> get _myRecentTransactions {
     return mytransactionsList.where((tran) {
       return tran.date.isAfter(DateTime.now().subtract(
@@ -69,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  //Criação de uma função para adicionar uma nova transação a lista de transações
+  //Função para adicionar uma nova transação a lista de transações
   _addTransaction(String newtittle, double newvalue, DateTime newdate) {
     final newTransaction = Transaction(
       id: Random().nextDouble().toString(),
@@ -81,14 +80,14 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       mytransactionsList.add(newTransaction);
     });
-    //para fechar o modal, assim que uma transação for submetida
-    //Navigator => Responsável por gerenciar a navegação de telas no flutter
     //NAV chama o metodo pop(), para fechar a tela atual e retornar à tela anterior na pilha de navegação
-    Navigator.of(context).pop();
+    Navigator.of(context)
+        .pop(); //Fecha o modal, assim que uma transação for submetida
   }
+  //Navigator => gerencia a navegação de telas no flutter
 
-//criação de uma função para remover uma transação da lista, recebe o id como parametro
-//a condição é que o ID da transação seja igual ao ID fornecido como parâmetro.
+  //Função para remover uma transação da lista, recebe o id como parametro
+  //a condição é que o ID da transação seja igual ao ID fornecido como parâmetro.
   _removeTransaction(String id) {
     setState(() {
       mytransactionsList.removeWhere((tran) => tran.id == id);
@@ -107,14 +106,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //Propiedade Actions que recebe uma lista de WD, como o 'iconButton' para add botão no appbar
+        //Propiedade Actions que recebe uma lista de WD
         actions: [
+          //'iconButton' para add botão no appbar
           IconButton(
               onPressed: () => _openTransactonFormModal(context),
               icon: const Icon(Icons.add)),
         ],
         title: const Text('Despesas pessoais'),
       ),
+      //singlechildScrollView = rolagem da tela
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -124,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      //Outro Botão para add transaçãor
+      //Outro Botão para add transação
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openTransactonFormModal(context),
         child: const Icon(Icons.add),

@@ -3,18 +3,21 @@ import '../models/transaction.dart';
 import 'package:intl/intl.dart';
 
 class TransactionsList extends StatelessWidget {
-  final List<Transaction> transactionsList;
-
+  //Declaração de uma lista <Transaction> e uma função de deletar
+  // class TransactionsList: Recebe a lista vacia passada pelo main
+  final List<Transaction> myTransactionsList;
   final void Function(String) onRemove;
 
-  const TransactionsList(this.transactionsList, this.onRemove, {Key? key})
+  //Parametros a serem recebidos na classe da lista de transações principal do app
+  const TransactionsList(this.myTransactionsList, this.onRemove, {Key? key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    //Build retorna um sizebox de aviso caso nenhuma transação tenha sido add
     return SizedBox(
-      height: 450,
-      child: transactionsList.isEmpty
+      height: 460,
+      child: myTransactionsList.isEmpty
           ? Column(
               children: [
                 const SizedBox(height: 20),
@@ -33,10 +36,16 @@ class TransactionsList extends StatelessWidget {
                 ),
               ],
             )
+          //Caso tenha transações, ele retorna os cards com cada transação
+          //commo o medoto recebe a lista de transações o ListView: tem acesso aos indices da lista e a torna rolavel
           : ListView.builder(
-              itemCount: transactionsList.length,
+              //LView recebe o comprimento da lista e uma função para construir cada elemento da lista
+              itemCount: myTransactionsList.length,
+              //recebendo o contexto o index de cada item
               itemBuilder: (ctx, index) {
-                final tr = transactionsList[index];
+                final tr = myTransactionsList[index];
+                //A classe TransactionsList consegue criar os cartões das transações com base nas info de cada objeto Transaction contido na lista.
+                //Card com toda a estrutura de cada cartão de despesa
                 return Card(
                   elevation: 6,
                   margin: const EdgeInsets.symmetric(
@@ -51,19 +60,23 @@ class TransactionsList extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(6),
                         child: FittedBox(
+                          //Valor
                           child: Text(
                             'R\$${tr.value}',
                           ),
                         ),
                       ),
                     ),
+                    //Titulo
                     title: Text(
                       tr.title,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
+                    //Subtitulo com Data
                     subtitle: Text(
                       DateFormat('d MMM y').format(tr.date),
                     ),
+                    //Botão de Remoção
                     trailing: IconButton(
                       onPressed: () => onRemove(tr.id),
                       icon: const Icon(Icons.delete),
