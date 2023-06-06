@@ -16,7 +16,7 @@ class TransactionsList extends StatelessWidget {
   Widget build(BuildContext context) {
     //Build retorna um sizebox de aviso caso nenhuma transação tenha sido add
     return SizedBox(
-      height: 460,
+      height: 400,
       child: myTransactionsList.isEmpty
           ? Column(
               children: [

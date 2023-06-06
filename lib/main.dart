@@ -104,24 +104,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final appbar = AppBar(
+      //Propiedade Actions que recebe uma lista de WD
+      actions: [
+        //'iconButton' para add botão no appbar
+        IconButton(
+            onPressed: () => _openTransactonFormModal(context),
+            icon: const Icon(Icons.add)),
+      ],
+      title: const Text('Despesas pessoais'),
+    );
+    //a aplicação da altura faz com que os componentes se adaptam melhor a diferentes tamanhos de tela
+    final altura = MediaQuery.of(context).size.height -
+        appbar.preferredSize.height -
+        MediaQuery.of(context).padding.top;
     return Scaffold(
-      appBar: AppBar(
-        //Propiedade Actions que recebe uma lista de WD
-        actions: [
-          //'iconButton' para add botão no appbar
-          IconButton(
-              onPressed: () => _openTransactonFormModal(context),
-              icon: const Icon(Icons.add)),
-        ],
-        title: const Text('Despesas pessoais'),
-      ),
+      appBar: appbar,
       //singlechildScrollView = rolagem da tela
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Chart(_myRecentTransactions),
-            TransactionsList(mytransactionsList, _removeTransaction),
+            SizedBox(
+              height: altura * 0.25,
+              child: Chart(_myRecentTransactions),
+            ),
+            SizedBox(
+              height: altura * 0.75,
+              child: TransactionsList(mytransactionsList, _removeTransaction),
+            ),
           ],
         ),
       ),
