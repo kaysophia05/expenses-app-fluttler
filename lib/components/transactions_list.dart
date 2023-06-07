@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../models/transaction.dart';
 import 'package:intl/intl.dart';
 
@@ -18,24 +19,26 @@ class TransactionsList extends StatelessWidget {
     return SizedBox(
       height: 400,
       child: myTransactionsList.isEmpty
-          ? Column(
-              children: [
-                const SizedBox(height: 20),
-                Text(
-                  'Nenhuma Transação Cadastrada!',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  //padding: EdgeInsets.all(10),
-                  height: 200,
-                  child: Image.asset(
-                    'assets/images/waiting.png',
-                    fit: BoxFit.cover,
+          //ajustando o tamanho disponivel para img com o layoutbuilder
+          ? LayoutBuilder(builder: (ctx, Constraints) {
+              return Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    'Nenhuma Transação Cadastrada!',
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
-                ),
-              ],
-            )
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: Constraints.maxHeight * 0.6,
+                    child: Image.asset(
+                      'assets/images/waiting.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              );
+            })
           //Caso tenha transações, ele retorna os cards com cada transação
           //commo o medoto recebe a lista de transações o ListView: tem acesso aos indices da lista e a torna rolavel
           : ListView.builder(

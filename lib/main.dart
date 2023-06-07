@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'components/transactions_form.dart';
+import 'package:flutter/material.dart';
 import 'components/transactions_list.dart';
 import 'models/transaction.dart';
 import './components/chart.dart';
@@ -57,6 +57,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> mytransactionsList =
       []; //crianção de uma lista <classe transaction> p/ as transações
+  bool showChart = false;
 
 //função verifica se a data da transação é dentro de um intervalo de sete dias a partir da data atual,  se for, retorna true
 //Resultado é convertivo em mais uma transação recente na lista
@@ -80,11 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       mytransactionsList.add(newTransaction);
     });
-    //NAV chama o metodo pop(), para fechar a tela atual e retornar à tela anterior na pilha de navegação
-    Navigator.of(context)
-        .pop(); //Fecha o modal, assim que uma transação for submetida
+    //NAV chama o metodo pop() p\ Fechar o modal, assim que uma transação for submetida
+    //Navigator => gerencia a navegação de telas no flutter
+    Navigator.of(context).pop();
   }
-  //Navigator => gerencia a navegação de telas no flutter
 
   //Função para remover uma transação da lista, recebe o id como parametro
   //a condição é que o ID da transação seja igual ao ID fornecido como parâmetro.
@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-//criação de uma função para criar um modal na parte inferior da tela para preencher o formulario
+//Função para criar um modal na parte inferior da tela para preencher o formulario
   _openTransactonFormModal(BuildContext context) {
     showModalBottomSheet(
         context:
@@ -104,10 +104,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    //===========================================VARIÁVEIS======================================================
+    //P\ MODO PAISAGEM
+    bool landscapemode =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    // A propriedade orientation de MediaQuery retorna a orientação atual da tela (retrato ou paisagem)
+    // == Orientation.landscape aqui verifica se a orientação é paisagem retornando um val bool para landscape mode
+
+    //APP BAR
     final appbar = AppBar(
-      //Propiedade Actions que recebe uma lista de WD
       actions: [
-        //'iconButton' para add botão no appbar
         IconButton(
             onPressed: () => _openTransactonFormModal(context),
             icon: const Icon(Icons.add)),
@@ -118,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final altura = MediaQuery.of(context).size.height -
         appbar.preferredSize.height -
         MediaQuery.of(context).padding.top;
+    //===========================================OFF-VARIÁVEIS=================================================
     return Scaffold(
       appBar: appbar,
       //singlechildScrollView = rolagem da tela
@@ -125,14 +132,33 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              height: altura * 0.25,
-              child: Chart(_myRecentTransactions),
-            ),
-            SizedBox(
-              height: altura * 0.75,
-              child: TransactionsList(mytransactionsList, _removeTransaction),
-            ),
+            if (landscapemode) //se estiver em paisagem, o botão para exibir o gráfico é exibido
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //showchat incia com false, quando o user interage com o swith acionando o botão, onchanged recebe o novo valor bool = true
+                  //showchat é atdd para true = newvalue
+                  const Text('Exibir Grafico'),
+                  Switch(
+                    value: showChart,
+                    onChanged: (bool newvalue) {
+                      setState(() {
+                        showChart = newvalue;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            if (showChart || !landscapemode)
+              SizedBox(
+                height: altura * (landscapemode ? 0.7 : 0.3),
+                child: Chart(_myRecentTransactions),
+              ),
+            if (!showChart || !landscapemode)
+              SizedBox(
+                height: altura * 0.7,
+                child: TransactionsList(mytransactionsList, _removeTransaction),
+              ),
           ],
         ),
       ),
