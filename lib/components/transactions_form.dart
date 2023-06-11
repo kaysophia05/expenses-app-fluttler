@@ -1,3 +1,5 @@
+import 'package:expenses/components/adaptative_button.dart';
+import 'package:expenses/components/adptative_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 //FORMULÁRIO DE TRANSAÇÕES
@@ -53,69 +55,65 @@ class _TransactionFormState extends State<TransactionForm> {
   Widget build(BuildContext context) {
     //Card para adicionar as informações
     //Card contem uma coluna para add os campos de entrada de dados
-    return Card(
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            //dois WD de imputação de texto para o titulo e valor
-            TextField(
-              controller: titlecontroller,
-              //propiedade: quando o user submetre os valores ja no teclado, apertando "Enter"
-              onSubmitted: (_) => _submitForm(),
-              decoration: const InputDecoration(labelText: 'Titulo'),
-            ),
-            TextField(
-              controller: valuecontroller,
-              onSubmitted: (_) => _submitForm(),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Valor (R\$)',
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 10,
+            right: 10,
+            left: 10,
+            //formulario com scroll para o teclado não atrapalhar a vizualização
+            bottom: 10 + MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Column(
+            children: [
+              AdapitativeTextField(
+                  controller: titlecontroller,
+                  label: 'Titulo',
+                  onSubmitted: (_) => _submitForm()),
+              AdapitativeTextField(
+                controller: valuecontroller,
+                label: 'Valor (R\$)',
+                onSubmitted: (_) => _submitForm(),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
               ),
-            ),
-            //CAIXA 1
-            SizedBox(
-              height: 70,
-              child: Row(
-                children: [
-                  Expanded(
-                    //CONDEIÇÃO: se o valor da data for um valor nulo, retorna o texto, se não retorna o valor da data.
-                    child: Text(
-                      _selectedDate == null
-                          ? 'Nenhuma Data selecionada'
-                          : 'Data Selacionada ${DateFormat('dd/MM/y').format(_selectedDate!)}',
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: _datePicker,
-                    child: const Text(
-                      'Selecionar Data',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+              //CAIXA 1
+              SizedBox(
+                height: 70,
+                child: Row(
+                  children: [
+                    Expanded(
+                      //CONDEIÇÃO: se o valor da data for um valor nulo, retorna o texto, se não retorna o valor da data.
+                      child: Text(
+                        _selectedDate == null
+                            ? 'Nenhuma Data selecionada'
+                            : 'Data Selacionada ${DateFormat('dd/MM/y').format(_selectedDate!)}',
                       ),
                     ),
-                  ),
+                    TextButton(
+                      onPressed: _datePicker,
+                      child: const Text(
+                        'Selecionar Data',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              //CAIXA 2
+              //card recebe uma linha ROW para add um botão, o row alxilia p/ o posicionamento
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  AdaptativeButton('Nova Transação', _submitForm),
                 ],
               ),
-            ),
-            //CAIXA 2
-            //card recebe uma linha ROW para add um botão, o row alxilia p/ o posicionamento
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                ElevatedButton(
-                  //Assim que o botão é clicado, a função declarada obtem os 2 valores e repassa p/ o componete pai
-                  //OnSubmit passa para  _addtransaction no main, para os dados serem adicionados a lista de transações
-                  onPressed: _submitForm,
-                  child: const Text(
-                    'Nova Transação',
-                  ),
-                )
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

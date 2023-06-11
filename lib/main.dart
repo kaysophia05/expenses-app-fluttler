@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
+
 import 'components/transactions_form.dart';
 import 'package:flutter/material.dart';
 import 'components/transactions_list.dart';
 import 'models/transaction.dart';
 import './components/chart.dart';
 import 'dart:math';
+import 'dart:io';
 
 void main() => runApp(ExpensesApp());
 
@@ -57,10 +60,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> mytransactionsList =
       []; //crianção de uma lista <classe transaction> p/ as transações
-  bool showChart = false;
-
 //função verifica se a data da transação é dentro de um intervalo de sete dias a partir da data atual,  se for, retorna true
 //Resultado é convertivo em mais uma transação recente na lista
+  bool showChart = false;
   List<Transaction> get _myRecentTransactions {
     return mytransactionsList.where((tran) {
       return tran.date.isAfter(DateTime.now().subtract(
@@ -69,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
+//====================================FUNCTONS======================================================
   //Função para adicionar uma nova transação a lista de transações
   _addTransaction(String newtittle, double newvalue, DateTime newdate) {
     final newTransaction = Transaction(
@@ -102,72 +105,101 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (_) => TransactionForm(_addTransaction));
   }
 
+  Widget _getIconButton(IconData icon, Function() fn) {
+    return Platform.isIOS
+        ? GestureDetector(onTap: fn, child: Icon(icon))
+        : IconButton(onPressed: fn, icon: Icon(icon));
+  }
+  //====================================OFF FUNCTONS======================================================
+
   @override
   Widget build(BuildContext context) {
     //===========================================VARIÁVEIS======================================================
-    //P\ MODO PAISAGEM
-    bool landscapemode =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    //-------------const mediaquery-------------
+    final mediaQuery = MediaQuery.of(context);
+    //--------- MODO PAISAGEM-------------------
+    bool landscapemode = mediaQuery.orientation == Orientation.landscape;
     // A propriedade orientation de MediaQuery retorna a orientação atual da tela (retrato ou paisagem)
     // == Orientation.landscape aqui verifica se a orientação é paisagem retornando um val bool para landscape mode
-
-    //APP BAR
+    final iconList = Platform.isIOS ? CupertinoIcons.refresh : Icons.add;
+    final chartList =
+        Platform.isIOS ? CupertinoIcons.refresh : Icons.show_chart;
+    //----------------Actions an App Bart--------------
+    final actions = [
+      if (landscapemode) //se estiver em paisagem, o botão para exibir o gráfico é exibido
+        _getIconButton(
+          showChart ? iconList : chartList,
+          () {
+            setState(() {
+              showChart = !showChart;
+            });
+          },
+          //condição: se o grafico estiver ligado exibe o botão de da lista, se não o botão do grafico
+        ),
+      _getIconButton(
+        Platform.isIOS ? CupertinoIcons.add : Icons.add,
+        () => _openTransactonFormModal(context),
+      ),
+    ];
+    //-----------APP BAR-------------------------
     final appbar = AppBar(
-      actions: [
-        IconButton(
-            onPressed: () => _openTransactonFormModal(context),
-            icon: const Icon(Icons.add)),
-      ],
+      actions: actions,
       title: const Text('Despesas pessoais'),
     );
+    //----------------Constante Altura-----------
     //a aplicação da altura faz com que os componentes se adaptam melhor a diferentes tamanhos de tela
-    final altura = MediaQuery.of(context).size.height -
+    final altura = mediaQuery.size.height -
         appbar.preferredSize.height -
-        MediaQuery.of(context).padding.top;
-    //===========================================OFF-VARIÁVEIS=================================================
-    return Scaffold(
-      appBar: appbar,
-      //singlechildScrollView = rolagem da tela
-      body: SingleChildScrollView(
+        mediaQuery.padding.top;
+
+    //---------------------BODY---------------
+    final bodyPage = SafeArea(
+      child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (landscapemode) //se estiver em paisagem, o botão para exibir o gráfico é exibido
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  //showchat incia com false, quando o user interage com o swith acionando o botão, onchanged recebe o novo valor bool = true
-                  //showchat é atdd para true = newvalue
-                  const Text('Exibir Grafico'),
-                  Switch(
-                    value: showChart,
-                    onChanged: (bool newvalue) {
-                      setState(() {
-                        showChart = newvalue;
-                      });
-                    },
-                  ),
-                ],
-              ),
+            //  if (landscapemode) //se estiver em paisagem, o botão para exibir o gráfico é exibido
+
             if (showChart || !landscapemode)
               SizedBox(
-                height: altura * (landscapemode ? 0.7 : 0.3),
+                //(landscapemode ? 0.7 : 0.3) = se estiver no modo paisagem usa-se 0.7 da tela, se não, use, 0.3
+                height: altura * (landscapemode ? 0.75 : 0.25),
                 child: Chart(_myRecentTransactions),
               ),
             if (!showChart || !landscapemode)
               SizedBox(
-                height: altura * 0.7,
+                height: altura * (landscapemode ? 1 : 0.7),
                 child: TransactionsList(mytransactionsList, _removeTransaction),
               ),
           ],
         ),
       ),
-      //Outro Botão para add transação
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openTransactonFormModal(context),
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+
+    //===========================================OFF-VARIÁVEIS=================================================
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+              middle: const Text('Despesas Pessoais'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: actions,
+              ),
+            ),
+            child: bodyPage)
+        : Scaffold(
+            appBar: appbar,
+            //singlechildScrollView = rolagem da tela
+            body: bodyPage,
+            //Outro Botão para add transação
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    onPressed: () => _openTransactonFormModal(context),
+                    child: const Icon(Icons.add),
+                  ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+          );
   }
 }
